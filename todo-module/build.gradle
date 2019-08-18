@@ -1,0 +1,20 @@
+plugins {
+  id "com.moowork.node" version "1.2.0"
+  id "java"
+}
+
+node {
+  version = '10.15.0'
+  npmVersion = '6.4.1'
+  download = true
+}
+
+task npmBuild(type: NpmTask) {
+  args = ['run', 'build']
+}
+
+task npmClean(type: Delete) {
+  delete 'dist'
+}
+
+npmBuild.dependsOn(npmInstall)

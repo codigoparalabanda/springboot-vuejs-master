@@ -1,0 +1,49 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.7.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+	id 'java'
+}
+
+group = 'com.slash.springboot.vuejs'
+version = '1.0'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile project(':todo-module')
+	//implementation project(path: ':vue-module', configuration: 'default')
+	implementation project(':todo-module')
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.0.1.RELEASE'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+
+
+// frontend build & copy to build dir
+task resourcesCopy(dependsOn: ':todo-module:npmBuild') {
+    doLast {
+        // copy template
+        copy {
+            from '../todo-module/dist/index.html'
+            into 'build/resources/main/templates'
+        }
+        // copy static
+        copy {
+            //from '../todo-module/dist/static'
+			//into 'build/resources/main/static/static'
+			from '../todo-module/build/resources/main/static'
+            into 'build/resources/main/static'
+        }
+    }
+}
+
+bootJar {
+    baseName = 'spring-boot-vuejs-spa'
+    version =  '1.0'
+
+    dependsOn 'resourcesCopy'
+}
