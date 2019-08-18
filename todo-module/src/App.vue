@@ -1,6 +1,23 @@
 <template>
 	<div id="app">
-		<h4 class="bg-dark text-white text-center p-2">
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Equipo</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="equipo in equipos" :key="equipo.id">
+                <td>{{ equipo.id }}</td>
+                <td>{{ equipo.nombre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4 class="bg-dark text-white text-center p-2">
 			{{ name }}'s To Do List
 		</h4>
 
@@ -27,7 +44,7 @@
 					</div>
 				</div>
 			</template>
-			
+
 			<div class="row py-2">
 				<div class="col">
 					<input type="text" class="form-control" v-model="newItemText" />
@@ -38,7 +55,7 @@
 					</button>
 				</div>
 			</div>
-			
+
 			<div class="row bg-secondary py-2 mt-2 text-white">
 				<div class="col text-center">
 					<input type="checkbox"
@@ -61,6 +78,9 @@
 </template>
 
 <script>
+//import equipoApi from '../../services/equipo-api'
+import equipoApi from '../src/services/equipo-api'
+
 export default {
   name: 'app',
   data () {
@@ -68,7 +88,9 @@ export default {
       name: 'Emmanuel',
       tasks: [],
       hideCompleted: true,
-      newItemText: ''
+      newItemText: '',
+      equipos: [],
+      loading: true
     }
   },
   computed: {
@@ -96,12 +118,27 @@ export default {
       this.storeData()
     },
 
+    getEquipos() {
+      equipoApi.getAll()
+      .then(response => {
+          console.info("Data loaded: ", response)
+          this.equipos = response.data
+      })
+      .catch(error => {
+          console.error(error)
+          this.error = "Failed to load equipos"
+      })
+      .finally(() => this.loading = false)
+    },
+
     created () {
       let data = localStorage.getItem('todos')
 
       if (data != null) {
         this.tasks = JSON.parse(data)
       }
+
+      this.getEquipos()
     }
   },
   mounted () {
